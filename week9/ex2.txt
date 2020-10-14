@@ -1,0 +1,3 @@
+To increase the Hit/Miss ratio we need to construct a sequence of references that consists of the same page reference. This will
+result in a Hit/Miss ratio of 999/1.
+To decrease it we construct a sequence with distinct page references. this will result in Hit/Miss ratio of 0.
