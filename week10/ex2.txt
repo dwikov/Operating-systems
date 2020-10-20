@@ -1,0 +1,9 @@
+tmgbug@tmgbug-desktop:~/week10$ link ../week1/file.txt _ex2.txt
+tmgbug@tmgbug-desktop:~/week10$ ls -i _ex2.txt
+2783506 _ex2.txt
+tmgbug@tmgbug-desktop:~/week10$ find -inum 2783506
+./_ex2.txt
+tmgbug@tmgbug-desktop:~/week10$ find -inum 2783506 -exec rm {} \;
+tmgbug@tmgbug-desktop:~/week10$ ls -i _ex2.txt
+ls: cannot access '_ex2.txt': No such file or directory
+
