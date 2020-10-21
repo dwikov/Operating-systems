@@ -1,4 +1,4 @@
-tmgbug@tmgbug-desktop:~/week10$ chmod ugo-x _ex3.txt
+tmgbug@tmgbug-desktop:~/week10$ chmod a-x _ex3.txt
 tmgbug@tmgbug-desktop:~/week10$ chmod uo+rwx _ex3.txt
 tmgbug@tmgbug-desktop:~/week10$ chmod g=u _ex3.txt
 
