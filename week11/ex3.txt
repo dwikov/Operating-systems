@@ -1,0 +1,1 @@
+Without \n two 'Hello' were printed, because with \n the output is flushed before the fork call.
