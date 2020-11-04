@@ -1,67 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
 
-#define BUFFER_SIZE 1024
+void error(char* err) {
+    printf("<error>: %s\n", err);
+    exit(-1);
+}
 
-int main(int argc, char *argv[])
-{
-    int fd, f, option, file_has;
-    ssize_t rd, wr_1, wr_2;
-    char buf[BUFFER_SIZE + 1];
+int main(int argc, char** argv) {
+    int truncate = (argc > 2 && !strcmp(argv[1], "-a")) ? 0 : O_TRUNC;    
+    if (truncate && argc < 2) error("file name is not specified.");
 
-    if (argc > 1)
-        file_has = 1;
-    if (file_has)
-    {
-        f = O_WRONLY | O_CREAT | O_TRUNC;
-        while ((option = getopt(argc, argv, "a")) != -1)
-        {
-            if (option == 'a')
-                f = O_WRONLY | O_APPEND | O_CREAT;
-            else
-            {
-                fprintf(stderr, "%s file [-a]\n", argv[0]);
-                exit(EXIT_FAILURE);
-            }
-        }
-        fd = open(argv[argc - 1], f, 0644);
-
-        if (fd == -1)
-        {
-            perror("open");
-            return EXIT_FAILURE;
-        }
+    size_t sz = argc - (truncate ? 1 : 2);
+    int off = (truncate ? 1 : 2);
+    int* fds = (int*)calloc(sz, sizeof(int));
+    for (int i = 0; i < sz; i++) {
+        fds[i] = open(argv[off + i], truncate | O_APPEND | O_CREAT | O_WRONLY, S_IRWXG | S_IRWXO | S_IRWXU);
     }
 
-    while ((rd = read(STDIN_FILENO, buf, BUFFER_SIZE)) != 0)
-    {
-        if (rd == -1)
-        {
-            if (errno == EINTR)
-                continue;
-            perror("read");
-            break;
-        }
-        wr_1 = write(STDOUT_FILENO, buf, rd);
-        if (wr_1 == -1)
-        {
-            perror("write");
-            exit(EXIT_FAILURE);
-        }
-        if (file_has)
-        {
-            wr_2 = write(fd, buf, rd);
-            if (wr_2 == -1)
-            {
-                perror("write");
-                exit(EXIT_FAILURE);
-            }
-        }
+    char c;
+    int f = open("/dev/stdin", O_RDONLY);
+    while(read(f, &c, 1) && c != EOF) {
+        for (int i = 0; i < sz; i++) write(fds[i], &c, 1);
     }
+    close(f);
+
+    for (int i = 0; i < sz; i++) close(fds[i]);
 
     return 0;
 }
